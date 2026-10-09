@@ -1,0 +1,160 @@
+/* =============================================================
+   CampusFix - Ambient Living Background
+   =============================================================
+   Atmospheric, multi-layered, cinematic ambient environment.
+   Inspired by high-end AI platforms (Manus, Linear, Vercel).
+   Zero runtime dependencies — pure GPU-accelerated CSS.
+   ============================================================= */
+
+.cf-ambient-root {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background-color: var(--bg-primary, #07070d);
+}
+
+/* ---- Layer 1: Base Radial Illumination ---- */
+.cf-ambient-spotlight {
+  position: absolute;
+  top: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1200px;
+  height: 700px;
+  background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.12) 0%, rgba(6, 182, 212, 0.04) 45%, transparent 70%);
+  filter: blur(80px);
+  opacity: 0.85;
+  will-change: transform;
+}
+
+/* ---- Layer 2: Aurora Mesh Fields ---- */
+.cf-ambient-mesh {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cf-aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  will-change: transform;
+  mix-blend-mode: screen;
+}
+
+/* Orb 1: Deep Indigo (Top-Left / Center) */
+.cf-aurora-1 {
+  top: 5%;
+  left: 10%;
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, rgba(79, 70, 229, 0.05) 60%, transparent 80%);
+  animation: cfFloat1 36s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  transform: translate3d(calc(var(--mouse-x, 0) * 12px), calc(var(--mouse-y, 0) * 12px), 0);
+}
+
+/* Orb 2: Electric Cyan / Teal (Top-Right / Mid) */
+.cf-aurora-2 {
+  top: 15%;
+  right: 8%;
+  width: 580px;
+  height: 580px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.10) 0%, rgba(20, 184, 166, 0.04) 55%, transparent 75%);
+  animation: cfFloat2 44s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate-reverse;
+  transform: translate3d(calc(var(--mouse-x, 0) * -16px), calc(var(--mouse-y, 0) * -16px), 0);
+}
+
+/* Orb 3: Deep Royal / Sapphire (Bottom-Center) */
+.cf-aurora-3 {
+  bottom: -5%;
+  left: 30%;
+  width: 720px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.08) 0%, rgba(99, 102, 241, 0.03) 60%, transparent 80%);
+  animation: cfFloat3 48s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  transform: translate3d(calc(var(--mouse-x, 0) * 8px), calc(var(--mouse-y, 0) * 8px), 0);
+}
+
+/* ---- Layer 3: Sparse Dust / Light Motes ---- */
+.cf-particles-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.45;
+}
+
+.cf-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffffff;
+  pointer-events: none;
+  animation: cfMotePulse 8s ease-in-out infinite alternate;
+}
+
+/* Specific sparse motes with varied coordinates and timings */
+.cf-mote:nth-child(1) { top: 18%; left: 22%; width: 2px; height: 2px; opacity: 0.3; animation-duration: 9s; }
+.cf-mote:nth-child(2) { top: 34%; left: 78%; width: 2.5px; height: 2.5px; opacity: 0.4; animation-duration: 12s; }
+.cf-mote:nth-child(3) { top: 62%; left: 15%; width: 1.5px; height: 1.5px; opacity: 0.25; animation-duration: 11s; }
+.cf-mote:nth-child(4) { top: 76%; left: 84%; width: 2px; height: 2px; opacity: 0.35; animation-duration: 14s; }
+.cf-mote:nth-child(5) { top: 28%; left: 52%; width: 2px; height: 2px; opacity: 0.28; animation-duration: 10s; }
+.cf-mote:nth-child(6) { top: 88%; left: 42%; width: 1.5px; height: 1.5px; opacity: 0.2; animation-duration: 13s; }
+.cf-mote:nth-child(7) { top: 12%; left: 88%; width: 2px; height: 2px; opacity: 0.3; animation-duration: 15s; }
+.cf-mote:nth-child(8) { top: 50%; left: 66%; width: 2.5px; height: 2.5px; opacity: 0.38; animation-duration: 8s; }
+
+/* ---- Layer 4: Fine Atmospheric Noise Texture ---- */
+.cf-ambient-noise {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.032;
+  background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* ---- Ambient Keyframes ---- */
+@keyframes cfFloat1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(40px, -30px, 0) scale(1.08); }
+  66% { transform: translate3d(-30px, 25px, 0) scale(0.96); }
+  100% { transform: translate3d(20px, 35px, 0) scale(1.04); }
+}
+
+@keyframes cfFloat2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(-35px, 40px, 0) scale(0.95); }
+  66% { transform: translate3d(30px, -20px, 0) scale(1.06); }
+  100% { transform: translate3d(-20px, -30px, 0) scale(1.02); }
+}
+
+@keyframes cfFloat3 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-45px, -25px, 0) scale(1.05); }
+  100% { transform: translate3d(45px, 20px, 0) scale(0.97); }
+}
+
+@keyframes cfMotePulse {
+  0% { opacity: 0.15; transform: translateY(0); }
+  50% { opacity: 0.55; transform: translateY(-8px); }
+  100% { opacity: 0.2; transform: translateY(-16px); }
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  .cf-aurora-orb {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .cf-mote {
+    animation: none !important;
+  }
+}

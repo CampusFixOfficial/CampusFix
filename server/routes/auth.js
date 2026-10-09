@@ -1,187 +1,150 @@
-// =============================================================
-// CampusFix - Auth Routes (Register, Login, Profile)
-// =============================================================
-// Handles user registration, login, and profile retrieval.
-// Owner: Bhavishya (authentication)
-// =============================================================
-
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const config = require('../config/env');
 const { protect } = require('../core/auth/middleware');
+const { verifyAuthorityCredentials } = require('../core/auth/authorityCredentials');
+const { rateLimit } = require('../core/security/rateLimit');
+const { sendRegistrationEmail, sendLoginEmail } = require('../core/notifications/emailService');
 
 const router = express.Router();
+const authRateLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 12, message: 'Too many sign-in attempts. Please wait 15 minutes and try again.' });
+const EMAIL_DOMAIN = 'vitbhopal.ac.in';
+const registrationPattern = /^(\d{2})([A-Z]{2,6})(\d{3,8})$/;
 
-// Helper: Generate JWT token for a user
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, config.JWT_SECRET, {
-    expiresIn: config.JWT_EXPIRES_IN,
-  });
-};
+function normalizeRegistrationNumber(value) {
+  return String(value || '').replace(/\s+/g, '').toUpperCase();
+}
 
-// =============================================================
-// POST /api/auth/register — Create a new account
-// =============================================================
-router.post('/register', async (req, res) => {
+function validateStudentIdentity(emailValue, registrationValue) {
+  const email = String(emailValue || '').trim().toLowerCase();
+  const registrationNumber = normalizeRegistrationNumber(registrationValue);
+  const match = registrationNumber.match(registrationPattern);
+  if (!match) return { valid: false, message: 'Enter a valid VIT registration number.' };
+  const configuredCodes = String(process.env.VIT_PROGRAM_CODES || '').split(',').map((item) => item.trim().toUpperCase()).filter(Boolean);
+  if (configuredCodes.length && !configuredCodes.includes(match[2])) {
+    return { valid: false, message: 'That program code is not enabled for registration.' };
+  }
+  const local = email.split('@')[0] || '';
+  const embeddedNumber = local.slice(local.lastIndexOf('.') + 1).toUpperCase();
+  if (email.split('@')[1] !== EMAIL_DOMAIN || embeddedNumber !== registrationNumber || !/^[a-z0-9._-]+$/i.test(local)) {
+    return { valid: false, message: 'Use your VIT Bhopal email with the same registration number.' };
+  }
+  return { valid: true, email, registrationNumber };
+}
+
+const generateToken = (userId) => jwt.sign({ id: userId }, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN });
+const publicUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  department: user.department,
+  employeeId: user.employeeId || '',
+  managedLocations: user.role === 'staff' ? (user.managedLocations || []) : [],
+  registrationNumber: user.registrationNumber || user.rollNumber || '',
+  rollNumber: user.registrationNumber || user.rollNumber || '',
+  studentType: user.studentType || '',
+  hostel: user.hostel || '',
+  phone: user.phone || '',
+});
+
+// Public registration is exclusively for students. Authorities and admins are created by admins.
+router.post('/register', authRateLimit, async (req, res) => {
   try {
-    const { name, email, password, role, rollNumber, hostel, phone, department } = req.body;
+    const { name, email, password, registrationNumber: rawRegistrationNumber, rollNumber, studentType, hostel, phone } = req.body;
+    const identity = validateStudentIdentity(email, rawRegistrationNumber || rollNumber);
+    if (!identity.valid) return res.status(400).json({ status: 'error', message: identity.message });
+    if (!name || String(name).trim().length < 2) return res.status(400).json({ status: 'error', message: 'Enter your full name.' });
+    if (!password || password.length < 8) return res.status(400).json({ status: 'error', message: 'Use a password with at least 8 characters.' });
+    if (!['Hosteller', 'Day Scholar'].includes(studentType)) return res.status(400).json({ status: 'error', message: 'Choose Hosteller or Day Scholar.' });
+    if (studentType === 'Hosteller' && !String(hostel || '').trim()) return res.status(400).json({ status: 'error', message: 'Add your hostel details.' });
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'An account with this email already exists',
-      });
-    }
+    const existingUser = await User.findOne({ $or: [{ email: identity.email }, { registrationNumber: identity.registrationNumber }] });
+    if (existingUser) return res.status(409).json({ status: 'error', message: 'An account already uses this email or registration number.' });
 
-    // Create the user (password gets hashed automatically by the model)
     const user = await User.create({
-      name,
-      email,
+      name: String(name).trim(),
+      email: identity.email,
       password,
-      role: role || 'student',
-      rollNumber: rollNumber || '',
-      hostel: hostel || '',
+      role: 'student',
+      registrationNumber: identity.registrationNumber,
+      rollNumber: identity.registrationNumber,
+      studentType,
+      hostel: studentType === 'Hosteller' ? String(hostel).trim() : '',
       phone: phone || '',
-      department: department || null,
     });
+    // Send email without blocking account creation.
+// Email failure should never prevent registration.
+sendRegistrationEmail(user)
+  .catch((emailError) => {
+    console.error('Registration email failed:', emailError.message);
+  });
 
-    // Generate a JWT token
-    const token = generateToken(user._id);
-
-    res.status(201).json({
-      status: 'success',
-      message: 'Account created successfully!',
-      data: {
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          rollNumber: user.rollNumber,
-          hostel: user.hostel,
-        },
-      },
-    });
-
+res.status(201).json({
+  status: 'success',
+  message: 'Your CampusFix account is ready.',
+  data: {
+    token: generateToken(user._id),
+    user: publicUser(user),
+  },
+});
   } catch (error) {
-    // Handle validation errors from Mongoose
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(e => e.message);
-      return res.status(400).json({
-        status: 'error',
-        message: messages.join('. '),
-      });
+      return res.status(400).json({ status: 'error', message: Object.values(error.errors).map((item) => item.message).join('. ') });
     }
     console.error('Register error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Something went wrong during registration',
-    });
+    res.status(500).json({ status: 'error', message: 'Something went wrong during registration.' });
   }
 });
 
-// =============================================================
-// POST /api/auth/login — Log in to an existing account
-// =============================================================
-router.post('/login', async (req, res) => {
+router.post('/login', authRateLimit, async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Please provide both email and password',
-      });
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const { password } = req.body;
+    if (!email || !password) return res.status(400).json({ status: 'error', message: 'Enter your email and password.' });
+    const user = await User.findOne({ email }).select('+password').populate('department', 'name');
+    if (!user || !(await user.comparePassword(password))) return res.status(401).json({ status: 'error', message: 'Invalid email or password.' });
+    if (!user.isActive) return res.status(401).json({ status: 'error', message: 'This account is not active. Contact a CampusFix administrator.' });
+    if (user.role === 'staff') {
+      const employeeId = String(req.body.employeeId || '').trim().toUpperCase();
+      const selectedDepartment = String(req.body.departmentName || '').trim().toLowerCase();
+      if (!employeeId || !selectedDepartment) {
+        return res.status(400).json({ status: 'error', message: 'Enter your employee ID and select the department assigned to your account.' });
+      }
+      if (!verifyAuthorityCredentials(user, employeeId, selectedDepartment)) {
+        return res.status(401).json({ status: 'error', message: 'The employee ID or department does not match this Authority account.' });
+      }
     }
+    // Send email without blocking account creation.
+// Email failure should never prevent registration.
+sendRegistrationEmail(user)
+  .catch((emailError) => {
+    console.error('Registration email failed:', emailError.message);
+  });
 
-    // Find user and include password field (normally excluded)
-    const user = await User.findOne({ email }).select('+password');
-
-    if (!user) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid email or password',
-      });
-    }
-
-    if (!user.isActive) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Account has been deactivated — contact admin',
-      });
-    }
-
-    // Check password
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid email or password',
-      });
-    }
-
-    // Generate token
-    const token = generateToken(user._id);
-
-    res.json({
-      status: 'success',
-      message: 'Logged in successfully!',
-      data: {
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          department: user.department,
-          rollNumber: user.rollNumber,
-          hostel: user.hostel,
-        },
-      },
-    });
-
+res.status(201).json({
+  status: 'success',
+  message: 'Your CampusFix account is ready.',
+  data: {
+    token: generateToken(user._id),
+    user: publicUser(user),
+  },
+});
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Something went wrong during login',
-    });
+    res.status(500).json({ status: 'error', message: 'Something went wrong during login.' });
   }
 });
 
-// =============================================================
-// GET /api/auth/me — Get current user's profile (protected)
-// =============================================================
 router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate('department', 'name');
-
-    res.json({
-      status: 'success',
-      data: {
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          department: user.department,
-          rollNumber: user.rollNumber,
-          hostel: user.hostel,
-          phone: user.phone,
-          createdAt: user.createdAt,
-        },
-      },
-    });
+    if (!user) return res.status(404).json({ status: 'error', message: 'Account not found.' });
+    res.json({ status: 'success', data: { user: { ...publicUser(user), createdAt: user.createdAt } } });
   } catch (error) {
     console.error('Profile error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Could not fetch profile',
-    });
+    res.status(500).json({ status: 'error', message: 'Could not fetch your profile.' });
   }
 });
 

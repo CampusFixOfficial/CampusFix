@@ -11,16 +11,25 @@ const path = require('path');
 // Load .env file from server directory
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
+// Render environment values can accidentally include copied quotes or line breaks.
+// Normalize the browser origin before the CORS middleware writes it to a header.
+const clientUrl = String(process.env.CLIENT_URL || 'http://localhost:5173')
+  .replace(/[\r\n]/g, '')
+  .trim()
+  .replace(/^['"]|['"]$/g, '');
+
 module.exports = {
   // Server
   PORT: process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || 'development',
 
   // Database
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/campusfix',
+  // Database connection details belong in the host environment, not source control.
+  MONGODB_URI: process.env.MONGODB_URI || '',
 
   // JWT Authentication
-  JWT_SECRET: process.env.JWT_SECRET || 'campusfix-dev-secret-change-in-production',
+  // Never fall back to a shared signing key; configure JWT_SECRET in the environment.
+  JWT_SECRET: process.env.JWT_SECRET || '',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
 
   // Cloudinary (image storage)
@@ -36,5 +45,5 @@ module.exports = {
   CLASSIFIER_URL: process.env.CLASSIFIER_URL || 'http://localhost:5001',
 
   // Frontend URL (for CORS)
-  CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+  CLIENT_URL: clientUrl,
 };

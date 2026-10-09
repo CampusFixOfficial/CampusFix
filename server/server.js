@@ -12,12 +12,16 @@ const cors = require('cors');
 const path = require('path');
 const config = require('./config/env');
 const connectDB = require('./config/db');
+const { startEscalationScheduler } = require('./core/escalation/scheduler');
 
 // Import route files
 const authRoutes = require('./routes/auth');
 const complaintRoutes = require('./routes/complaints');
 const departmentRoutes = require('./routes/departments');
+const adminRoutes = require('./routes/admin');
 const analyticsRoutes = require('./routes/analytics');
+const feedbackRoutes = require('./routes/feedback');
+const notificationRoutes = require('./routes/notifications');
 
 // Initialize Express app
 const app = express();
@@ -31,12 +35,20 @@ app.use(cors({
   origin: config.CLIENT_URL,
   credentials: true,
 }));
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (config.NODE_ENV === 'production') res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
 
 // Parse JSON request bodies (so we can read data sent from the frontend)
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '6mb' }));
 
 // Parse URL-encoded request bodies (for form submissions)
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '6mb' }));
 
 // =============================================================
 // API Routes
@@ -56,7 +68,10 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/departments', departmentRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // =============================================================
 // Error Handling
@@ -86,6 +101,7 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   // Connect to MongoDB
   await connectDB();
+  startEscalationScheduler();
 
   // Start listening
   app.listen(config.PORT, () => {

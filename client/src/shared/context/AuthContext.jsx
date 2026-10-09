@@ -8,30 +8,37 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export function AuthProvider({ children }) {
+  const { pathname } = useLocation();
+  const isLocalDemo = import.meta.env.DEV && pathname.startsWith('/__dev/');
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('campusfix_token'));
   const [loading, setLoading] = useState(true);
 
   // Set up axios defaults whenever token changes
   useEffect(() => {
-    if (token) {
+    if (token && !isLocalDemo) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       localStorage.setItem('campusfix_token', token);
     } else {
       delete axios.defaults.headers.common['Authorization'];
-      localStorage.removeItem('campusfix_token');
+      if (!token) localStorage.removeItem('campusfix_token');
     }
-  }, [token]);
+  }, [token, isLocalDemo]);
 
   // On app load, check if we have a valid token and fetch user info
   useEffect(() => {
     const loadUser = async () => {
+      if (isLocalDemo) {
+        setLoading(false);
+        return;
+      }
       if (!token) {
         setLoading(false);
         return;
@@ -50,22 +57,22 @@ export function AuthProvider({ children }) {
     };
 
     loadUser();
-  }, [token]);
+  }, [token, isLocalDemo]);
 
   // Register a new account
   const register = async (userData) => {
     const res = await axios.post(`${API_URL}/auth/register`, userData);
     setToken(res.data.data.token);
     setUser(res.data.data.user);
-    return res.data;
+    return res.data.data;
   };
 
   // Log in to an existing account
-  const login = async (email, password) => {
-    const res = await axios.post(`${API_URL}/auth/login`, { email, password });
+  const login = async (email, password, identity = {}) => {
+    const res = await axios.post(`${API_URL}/auth/login`, { email, password, ...identity });
     setToken(res.data.data.token);
     setUser(res.data.data.user);
-    return res.data;
+    return res.data.data;
   };
 
   // Log out

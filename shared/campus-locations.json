@@ -1,0 +1,299 @@
+{
+  "campus": "VIT Bhopal",
+  "groups": [
+    {
+      "id": "boys-hostels",
+      "label": "Boys’ hostels",
+      "caption": "Residential blocks · 1–8",
+      "locations": [
+        {
+          "id": "boys-hostel-block-1",
+          "label": "Block 1",
+          "displayName": "Boys Hostel Block 1",
+          "context": "Men’s Hostel",
+          "match": { "block": "Block 1", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 1", "boys' hostel block 1", "men's hostel block 1"],
+          "children": [
+            {
+              "id": "boys-block-1-multiple-sme-wings",
+              "label": "Multiple / SME Wings",
+              "displayName": "Multiple / SME Wings",
+              "context": "Block 1 · Men’s Hostel",
+              "match": { "block": "Block 1", "areaBuilding": "Men's Hostel", "specificArea": "Multiple / SME Wings" },
+              "aliases": ["multiple sme wings", "multiple wings", "sme wings", "multiple / sme wings"]
+            },
+            {
+              "id": "boys-block-1-rassannce-mess",
+              "label": "Rassannce Mess",
+              "displayName": "Rassannce Mess",
+              "context": "Block 1 area",
+              "match": { "block": "Block 1", "areaBuilding": "Men's Hostel", "specificArea": "Rassannce Mess" },
+              "aliases": ["rassannce mess", "rasannce mess"]
+            },
+            {
+              "id": "boys-block-1-additional-mess-1",
+              "label": "Additional mess · 1",
+              "displayName": "Additional mess location · 1",
+              "context": "Block 1 area · name to confirm",
+              "match": { "block": "Block 1", "areaBuilding": "Men's Hostel", "specificArea": "Additional mess location 1" },
+              "aliases": ["additional mess location 1", "additional mess 1"]
+            },
+            {
+              "id": "boys-block-1-additional-mess-2",
+              "label": "Additional mess · 2",
+              "displayName": "Additional mess location · 2",
+              "context": "Block 1 area · name to confirm",
+              "match": { "block": "Block 1", "areaBuilding": "Men's Hostel", "specificArea": "Additional mess location 2" },
+              "aliases": ["additional mess location 2", "additional mess 2"]
+            },
+            {
+              "id": "boys-block-1-athletic-field",
+              "label": "Athletic Field",
+              "displayName": "Athletic Field · Block 1 area",
+              "context": "Block 1 area · cricket practice nets are grouped here",
+              "match": { "specificArea": "Athletic Field" },
+              "aliases": ["athletic field", "cricket practice net"]
+            },
+            {
+              "id": "boys-block-1-open-badminton-court",
+              "label": "Open Badminton Court",
+              "displayName": "Open Badminton Court · Block 1 area",
+              "context": "Block 1 area",
+              "match": { "specificArea": "Open Badminton Court" },
+              "aliases": ["open badminton court", "badminton court block 1"]
+            },
+            {
+              "id": "boys-block-1-open-volleyball-court",
+              "label": "Open Volleyball Court",
+              "displayName": "Open Volleyball Court · Block 1 area",
+              "context": "Block 1 area",
+              "match": { "specificArea": "Open Volleyball Court" },
+              "aliases": ["open volleyball court", "open volleyball court block 1"]
+            },
+            {
+              "id": "boys-block-1-pickleball-court",
+              "label": "Pickleball Court",
+              "displayName": "Pickleball Court · left of Block 1",
+              "context": "Left of Block 1",
+              "match": { "specificArea": "Pickleball Court" },
+              "aliases": ["pickleball court", "pickle ball court"]
+            }
+          ]
+        },
+        {
+          "id": "boys-hostel-block-2",
+          "label": "Block 2",
+          "displayName": "Boys Hostel Block 2",
+          "context": "Men’s Hostel · A and B Wings",
+          "match": { "block": "Block 2", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 2", "boys' hostel block 2", "men's hostel block 2"],
+          "children": [
+            { "id": "boys-block-2-a-wing", "label": "A Wing", "displayName": "A Wing", "context": "Block 2 · Men’s Hostel", "match": { "block": "Block 2", "areaBuilding": "Men's Hostel", "wing": "A Wing" } },
+            { "id": "boys-block-2-b-wing", "label": "B Wing", "displayName": "B Wing", "context": "Block 2 · Men’s Hostel", "match": { "block": "Block 2", "areaBuilding": "Men's Hostel", "wing": "B Wing" } }
+          ]
+        },
+        {
+          "id": "boys-hostel-block-3",
+          "label": "Block 3",
+          "displayName": "Boys Hostel Block 3",
+          "context": "Men’s Hostel · A and B Wings",
+          "match": { "block": "Block 3", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 3", "boys' hostel block 3", "men's hostel block 3"],
+          "children": [
+            { "id": "boys-block-3-a-wing", "label": "A Wing", "displayName": "A Wing", "context": "Block 3 · Men’s Hostel", "match": { "block": "Block 3", "areaBuilding": "Men's Hostel", "wing": "A Wing" } },
+            { "id": "boys-block-3-b-wing", "label": "B Wing", "displayName": "B Wing", "context": "Block 3 · Men’s Hostel", "match": { "block": "Block 3", "areaBuilding": "Men's Hostel", "wing": "B Wing" } }
+          ]
+        },
+        {
+          "id": "boys-hostel-block-4",
+          "label": "Block 4",
+          "displayName": "Boys Hostel Block 4",
+          "context": "Men’s Hostel · A and B Wings",
+          "match": { "block": "Block 4", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 4", "boys' hostel block 4", "men's hostel block 4"],
+          "children": [
+            { "id": "boys-block-4-a-wing", "label": "A Wing", "displayName": "A Wing", "context": "Block 4 · Men’s Hostel", "match": { "block": "Block 4", "areaBuilding": "Men's Hostel", "wing": "A Wing" } },
+            { "id": "boys-block-4-b-wing", "label": "B Wing", "displayName": "B Wing", "context": "Block 4 · Men’s Hostel", "match": { "block": "Block 4", "areaBuilding": "Men's Hostel", "wing": "B Wing" } }
+          ]
+        },
+        {
+          "id": "boys-hostel-block-5",
+          "label": "Block 5",
+          "displayName": "Boys Hostel Block 5",
+          "context": "Men’s Hostel · A and B Wings",
+          "match": { "block": "Block 5", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 5", "boys' hostel block 5", "men's hostel block 5"],
+          "children": [
+            { "id": "boys-block-5-a-wing", "label": "A Wing", "displayName": "A Wing", "context": "Block 5 · Men’s Hostel", "match": { "block": "Block 5", "areaBuilding": "Men's Hostel", "wing": "A Wing" } },
+            {
+              "id": "boys-block-5-b-wing",
+              "label": "B Wing",
+              "displayName": "B Wing",
+              "context": "Block 5 · Men’s Hostel",
+              "match": { "block": "Block 5", "areaBuilding": "Men's Hostel", "wing": "B Wing" },
+              "children": [
+                { "id": "boys-block-5-b-wing-6th-floor", "label": "6th Floor", "displayName": "6th Floor · Block 5 B Wing", "context": "Block 5 · Men’s Hostel · B Wing", "match": { "block": "Block 5", "areaBuilding": "Men's Hostel", "floor": "6th Floor", "wing": "B Wing" } }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "boys-hostel-block-6",
+          "label": "Block 6",
+          "displayName": "Boys Hostel Block 6",
+          "context": "Men’s Hostel · A and B Wings",
+          "match": { "block": "Block 6", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 6", "boys' hostel block 6", "men's hostel block 6"],
+          "children": [
+            { "id": "boys-block-6-a-wing", "label": "A Wing", "displayName": "A Wing", "context": "Block 6 · Men’s Hostel", "match": { "block": "Block 6", "areaBuilding": "Men's Hostel", "wing": "A Wing" } },
+            { "id": "boys-block-6-b-wing", "label": "B Wing", "displayName": "B Wing", "context": "Block 6 · Men’s Hostel", "match": { "block": "Block 6", "areaBuilding": "Men's Hostel", "wing": "B Wing" } }
+          ]
+        },
+        {
+          "id": "boys-hostel-block-7",
+          "label": "Block 7",
+          "displayName": "Boys Hostel Block 7",
+          "context": "Men’s Hostel · A and B Wings",
+          "match": { "block": "Block 7", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 7", "boys' hostel block 7", "men's hostel block 7"],
+          "children": [
+            { "id": "boys-block-7-a-wing", "label": "A Wing", "displayName": "A Wing", "context": "Block 7 · Men’s Hostel", "match": { "block": "Block 7", "areaBuilding": "Men's Hostel", "wing": "A Wing" } },
+            { "id": "boys-block-7-b-wing", "label": "B Wing", "displayName": "B Wing", "context": "Block 7 · Men’s Hostel", "match": { "block": "Block 7", "areaBuilding": "Men's Hostel", "wing": "B Wing" } }
+          ]
+        },
+        {
+          "id": "boys-hostel-block-8",
+          "label": "Block 8",
+          "displayName": "Boys Hostel Block 8",
+          "context": "Men’s Hostel · A and B Wings",
+          "match": { "block": "Block 8", "areaBuilding": "Men's Hostel" },
+          "aliases": ["boys hostel block 8", "boys' hostel block 8", "men's hostel block 8"],
+          "children": [
+            { "id": "boys-block-8-a-wing", "label": "A Wing", "displayName": "A Wing", "context": "Block 8 · Men’s Hostel", "match": { "block": "Block 8", "areaBuilding": "Men's Hostel", "wing": "A Wing" } },
+            { "id": "boys-block-8-b-wing", "label": "B Wing", "displayName": "B Wing", "context": "Block 8 · Men’s Hostel", "match": { "block": "Block 8", "areaBuilding": "Men's Hostel", "wing": "B Wing" } }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "academic-and-labs",
+      "label": "Academic & laboratory spaces",
+      "caption": "Learning and technical facilities",
+      "locations": [
+        { "id": "academic-block-1", "label": "Academic Block 1", "displayName": "VITB Academic Block 1", "context": "Teaching and study spaces", "match": { "areaBuilding": "Academic Block 1" }, "aliases": ["vitb academic block 1", "academic block 1", "academic block one"] },
+        {
+          "id": "academic-block-2",
+          "label": "Academic Block 2",
+          "displayName": "VITB Academic Block 2",
+          "context": "Teaching spaces · front-facing field",
+          "match": { "areaBuilding": "Academic Block 2" },
+          "aliases": ["vitb academic block 2", "academic block 2", "academic block two"],
+          "children": [
+            { "id": "academic-block-2-football-field", "label": "Front-facing Football Field", "displayName": "Football Field · Academic Block 2 frontage", "context": "In front of Academic Block 2", "match": { "areaBuilding": "Academic Block 2", "specificArea": "Football Field" }, "aliases": ["front-facing football field", "football field in front of academic block 2"] }
+          ]
+        },
+        { "id": "vitb-lab-complex", "label": "VITB Lab Complex", "displayName": "VITB Lab Complex", "context": "Laboratories and technical spaces", "match": { "areaBuilding": "VITB Lab Complex" }, "aliases": ["vitb lab complex", "lab complex", "laboratory complex"] }
+      ]
+    },
+    {
+      "id": "girls-residence-and-mayuri",
+      "label": "Girls’ residence & Mayuri",
+      "caption": "Residence and Special Block services",
+      "locations": [
+        { "id": "girls-hostel-block-1", "label": "Girls Hostel Block 1", "displayName": "Girls Block 1", "context": "Women’s Hostel", "match": { "block": "Block 1", "areaBuilding": "Women's Hostel" }, "aliases": ["girls block 1", "girls hostel block 1", "girls' hostel block 1", "women's hostel block 1"] },
+        { "id": "girls-hostel-block-2", "label": "Girls Hostel Block 2", "displayName": "Girls Hostel Block 2", "context": "Women’s Hostel", "match": { "block": "Block 2", "areaBuilding": "Women's Hostel" }, "aliases": ["girls hostel block 2", "girls' hostel block 2", "women's hostel block 2"] },
+        {
+          "id": "mayuri-special-block",
+          "label": "Mayuri / Special Block",
+          "displayName": "Mayuri / Special Block",
+          "context": "Upper-floor accommodation · ground-floor services",
+          "match": { "areaBuilding": "Mayuri / Special Block" },
+          "aliases": ["mayuri", "special block", "ab dakshin"],
+          "children": [
+            { "id": "mayuri-girls-accommodation-upper", "label": "Girls’ accommodation · upper floors", "displayName": "Girls’ accommodation · Mayuri upper floors", "context": "Upper floors", "match": { "areaBuilding": "Mayuri / Special Block", "specificArea": "Girls' accommodation · upper floors" }, "aliases": ["girls accommodation upper floors", "girls' accommodation upper floors", "girls hostel mayuri upper floors"] },
+            { "id": "mayuri-ab-dakshin", "label": "Mayuri / AB Dakshin", "displayName": "Mayuri / AB Dakshin", "context": "Mayuri / Special Block", "match": { "areaBuilding": "Mayuri / Special Block", "specificArea": "Mayuri / AB Dakshin" }, "aliases": ["mayuri ab dakshin", "ab dakshin"] },
+            { "id": "mayuri-print-shop", "label": "Print Shop", "displayName": "Print Shop · Mayuri", "context": "Ground floor", "match": { "areaBuilding": "Mayuri / Special Block", "specificArea": "Print Shop" }, "aliases": ["print shop", "printing shop"] },
+            { "id": "mayuri-stationery-shop", "label": "Stationery Shop", "displayName": "Stationery Shop · Mayuri", "context": "Ground floor", "match": { "areaBuilding": "Mayuri / Special Block", "specificArea": "Stationery Shop" }, "aliases": ["stationery shop", "stationery store"] },
+            { "id": "mayuri-barber-shop", "label": "Barber Shop", "displayName": "Barber Shop · Mayuri", "context": "Ground floor", "match": { "areaBuilding": "Mayuri / Special Block", "specificArea": "Barber Shop" }, "aliases": ["barber shop", "barbershop"] },
+            { "id": "mayuri-cosmetic-shop", "label": "Cosmetic Shop", "displayName": "Cosmetic Shop · Mayuri", "context": "Ground floor", "match": { "areaBuilding": "Mayuri / Special Block", "specificArea": "Cosmetic Shop" }, "aliases": ["cosmetic shop", "cosmetics shop"] },
+            { "id": "mayuri-gym", "label": "Gym", "displayName": "Gym · Mayuri", "context": "Ground floor", "match": { "areaBuilding": "Mayuri / Special Block", "specificArea": "Gym" }, "aliases": ["mayuri gym", "gym in mayuri", "gym"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shared-amenities-and-food",
+      "label": "Shared amenities & food services",
+      "caption": "Campus service areas · linked by their named campus context",
+      "locations": [
+        {
+          "id": "blocks-4-5-area",
+          "label": "Blocks 4–5 shared area",
+          "displayName": "Blocks 4–5 shared area",
+          "context": "Shared amenities and outdoor court",
+          "matchAny": [ { "block": "Block 4" }, { "block": "Block 5" } ],
+          "children": [
+            { "id": "amenity-block", "label": "Amenity Block", "displayName": "Amenity Block", "context": "Blocks 4–5 area", "match": { "specificArea": "Amenity Block" }, "aliases": ["amenity block"] },
+            { "id": "blocks-4-5-volleyball-court", "label": "Volleyball Court", "displayName": "Volleyball Court · Blocks 4–5 area", "context": "Blocks 4–5 area", "match": { "specificArea": "Volleyball Court" }, "aliases": ["volleyball court near block 4", "volleyball court near block 5", "blocks 4 5 volleyball court"] }
+          ]
+        },
+        {
+          "id": "blocks-6-8-dining-area",
+          "label": "Blocks 6–8 dining area",
+          "displayName": "Blocks 6–8 dining area",
+          "context": "Dining Hostel and mess services",
+          "matchAny": [ { "block": "Block 6" }, { "block": "Block 8" } ],
+          "children": [
+            { "id": "dining-hostel", "label": "Dining Hostel", "displayName": "Dining Hostel", "context": "Blocks 6–8 area", "match": { "areaBuilding": "Dining Hostel" }, "aliases": ["dining hostel", "hostel dining"] },
+            { "id": "safal-mess", "label": "Safal Mess", "displayName": "Safal Mess", "context": "Blocks 6–8 area · Dining Hostel vicinity", "match": { "specificArea": "Safal Mess" }, "aliases": ["safal mess"] },
+            { "id": "jmb-mess", "label": "JMB Mess", "displayName": "JMB Mess", "context": "Blocks 6–8 area · Dining Hostel vicinity", "match": { "specificArea": "JMB Mess" }, "aliases": ["jmb mess"] }
+          ]
+        },
+        {
+          "id": "block-8-shared-area",
+          "label": "Block 8 shared area",
+          "displayName": "Block 8 shared area",
+          "context": "Anchor Mess and rooftop turf",
+          "match": { "block": "Block 8" },
+          "children": [
+            { "id": "anchor-mess", "label": "Anchor Mess", "displayName": "Anchor Mess", "context": "Block 8 shared area", "match": { "specificArea": "Anchor Mess" }, "aliases": ["anchor mess"] },
+            { "id": "rooftop-turf", "label": "Rooftop Turf", "displayName": "Rooftop Turf", "context": "Block 8 shared area", "match": { "specificArea": "Rooftop Turf" }, "aliases": ["rooftop turf", "roof turf"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sports-and-outdoors",
+      "label": "Sports & outdoors",
+      "caption": "Outdoor spaces · associated campus area shown with each entity",
+      "locations": [
+        { "id": "athletic-field", "label": "Athletic Field", "displayName": "Athletic Field · Block 1 area", "context": "Block 1 area", "match": { "specificArea": "Athletic Field" }, "aliases": ["athletic field", "cricket practice net"] },
+        { "id": "open-badminton-court", "label": "Open Badminton Court", "displayName": "Open Badminton Court · Block 1 area", "context": "Block 1 area", "match": { "specificArea": "Open Badminton Court" }, "aliases": ["open badminton court", "badminton court block 1"] },
+        { "id": "open-volleyball-court", "label": "Open Volleyball Court", "displayName": "Open Volleyball Court · Block 1 area", "context": "Block 1 area", "match": { "specificArea": "Open Volleyball Court" }, "aliases": ["open volleyball court", "open volleyball court block 1"] },
+        { "id": "pickleball-court", "label": "Pickleball Court", "displayName": "Pickleball Court · Block 1 area", "context": "Left of Block 1", "match": { "specificArea": "Pickleball Court" }, "aliases": ["pickleball court", "pickle ball court"] },
+        { "id": "cricket-field", "label": "Cricket Field", "displayName": "Cricket Field", "context": "Outdoor sports area", "match": { "specificArea": "Cricket Field" }, "aliases": ["cricket field", "cricket ground"] },
+        { "id": "football-field", "label": "Football Field", "displayName": "Football Field · Academic Block 2 frontage", "context": "In front of Academic Block 2", "match": { "specificArea": "Football Field" }, "aliases": ["football field", "front-facing football field"] },
+        { "id": "volleyball-court", "label": "Volleyball Court", "displayName": "Volleyball Court · Blocks 4–5 area", "context": "Blocks 4–5 area", "match": { "specificArea": "Volleyball Court" }, "aliases": ["volleyball court"] }
+      ]
+    },
+    {
+      "id": "health-and-common-facilities",
+      "label": "Health & common facilities",
+      "caption": "Multipurpose and other shared campus facilities",
+      "locations": [
+        {
+          "id": "multipurpose-hall",
+          "label": "Multipurpose Hall",
+          "displayName": "Multipurpose Hall",
+          "context": "Common campus facility",
+          "match": { "areaBuilding": "Multipurpose Hall" },
+          "aliases": ["multipurpose hall", "multi purpose hall"],
+          "children": [
+            { "id": "dr-morepens-clinic", "label": "Dr. Morepens Clinic", "displayName": "Dr. Morepens Clinic · Multipurpose Hall", "context": "Inside Multipurpose Hall", "match": { "areaBuilding": "Multipurpose Hall", "specificArea": "Dr. Morepens Clinic" }, "aliases": ["dr morepens clinic", "morepens clinic"] }
+          ]
+        },
+        { "id": "other-common-facilities", "label": "Other common campus facilities", "displayName": "Other common campus facilities", "context": "Named area to be confirmed from report", "match": { "specificArea": "Other common campus facilities" }, "aliases": ["other common campus facilities", "other campus facility"] }
+      ]
+    }
+  ]
+}

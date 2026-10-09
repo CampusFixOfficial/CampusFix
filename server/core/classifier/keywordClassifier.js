@@ -1,77 +1,39 @@
-// =============================================================
-// CampusFix - Rule-Based Keyword Classifier
-// =============================================================
-// Scores complaint text against department keyword sets
-// and returns the best-matching department.
-// Owner: Bhavishya (routing/classification)
-// =============================================================
-
 const Department = require('../../models/Department');
+const { DEFAULT_DEPARTMENTS } = require('../../config/departments');
 
-/**
- * Classify a complaint based on keyword matching.
- * 
- * @param {string} text - The complaint text (title + description)
- * @returns {object} - { departmentId, departmentName, confidence, method }
- */
-const classifyByKeywords = async (text) => {
+function scoreText(text, department) {
+  const normalized = String(text || '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ');
+  const matches = department.keywords.filter((keyword) => normalized.includes(keyword.toLowerCase()));
+  return { department, matchCount: matches.length, score: matches.length ? matches.length / Math.sqrt(department.keywords.length) : 0 };
+}
+
+async function classifyByKeywords(text) {
   try {
-    // Get all active departments with their keywords
-    const departments = await Department.find({ isActive: true });
+    const records = await Department.find({ name: { $in: DEFAULT_DEPARTMENTS.map((item) => item.name) }, isActive: true });
+    const recordByName = new Map(records.map((record) => [record.name, record]));
+    const scores = DEFAULT_DEPARTMENTS.map((department) => {
+      const record = recordByName.get(department.name);
+      const liveRules = record?.keywords?.length ? { ...department, keywords: record.keywords } : department;
+      return { ...scoreText(text, liveRules), record };
+    })
+      .filter((item) => item.matchCount > 0)
+      .sort((a, b) => b.score - a.score || b.matchCount - a.matchCount);
 
-    if (!departments.length) {
-      return { departmentId: null, departmentName: null, confidence: 0, method: 'keyword' };
-    }
-
-    // Normalize the text: lowercase, remove punctuation
-    const normalizedText = text.toLowerCase().replace(/[^\w\s]/g, '');
-    const words = normalizedText.split(/\s+/);
-
-    // Score each department
-    const scores = departments.map(dept => {
-      let matchCount = 0;
-      let totalKeywords = dept.keywords.length || 1; // avoid division by zero
-
-      dept.keywords.forEach(keyword => {
-        // Check if the keyword (which could be a phrase) appears in the text
-        if (normalizedText.includes(keyword.toLowerCase())) {
-          matchCount++;
-        }
-      });
-
-      return {
-        department: dept,
-        score: matchCount / totalKeywords, // Normalized score (0 to 1)
-        matchCount,
-      };
-    });
-
-    // Sort by score (highest first)
-    scores.sort((a, b) => b.score - a.score);
+    if (!scores.length) return { departmentId: null, departmentName: null, confidence: 0, method: 'keyword' };
 
     const best = scores[0];
-
-    // If no keywords matched, return null (needs manual review)
-    if (best.matchCount === 0) {
-      return {
-        departmentId: null,
-        departmentName: null,
-        confidence: 0,
-        method: 'keyword',
-      };
-    }
-
+    const record = best.record;
     return {
-      departmentId: best.department._id,
+      departmentId: record?._id || null,
       departmentName: best.department.name,
-      confidence: Math.min(best.score, 1),
+      confidence: Math.min(best.matchCount / 3, 1),
       method: 'keyword',
+      slaHours: record?.slaHours || best.department.slaHours,
     };
-
   } catch (error) {
     console.error('Keyword classifier error:', error);
     return { departmentId: null, departmentName: null, confidence: 0, method: 'keyword' };
   }
-};
+}
 
 module.exports = { classifyByKeywords };

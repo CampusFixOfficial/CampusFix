@@ -29,6 +29,13 @@ const statusHistorySchema = new mongoose.Schema({
   },
 });
 
+const authorityRemarkSchema = new mongoose.Schema({
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  authorLabel: { type: String, enum: ['Authority', 'Hostel Warden'], default: 'Authority' },
+  message: { type: String, required: true, trim: true, minlength: 3, maxlength: 1200 },
+  timestamp: { type: Date, default: Date.now },
+}, { _id: true });
+
 const complaintSchema = new mongoose.Schema({
   // The complaint text written by the student
   title: {
@@ -55,6 +62,9 @@ const complaintSchema = new mongoose.Schema({
   // Full history of every status change
   statusHistory: [statusHistorySchema],
 
+  // Public-to-student Authority updates; internal notes must never be stored here.
+  authorityRemarks: [authorityRemarkSchema],
+
   // Who filed this complaint
   complainant: {
     type: mongoose.Schema.Types.ObjectId,
@@ -76,18 +86,25 @@ const complaintSchema = new mongoose.Schema({
     default: null,
   },
 
-  // Anonymous mode — hides the complainant's identity
-  isAnonymous: {
-    type: Boolean,
-    default: false,
-  },
-
   // Location where the issue is (e.g., "Hostel A - Room 204", "Library")
   location: {
     type: String,
     default: '',
     trim: true,
   },
+
+  // Structured location describes where the problem happened, never the student's residence.
+  problemLocation: {
+    campus: { type: String, default: '' },
+    block: { type: String, default: '' },
+    areaBuilding: { type: String, default: '' },
+    floor: { type: String, default: '' },
+    wing: { type: String, default: '' },
+    specificArea: { type: String, default: '' },
+  },
+  expectedResolutionAt: { type: Date, default: null },
+  expectedResolutionLabel: { type: String, default: '' },
+  acknowledgedAt: { type: Date, default: null },
 
   // Photo evidence URLs (stored on Cloudinary)
   images: [{

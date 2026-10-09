@@ -1,199 +1,86 @@
-// =============================================================
-// CampusFix - Register Page
-// =============================================================
-// Owner: Pranjal (student portal) — shared across portals
-// =============================================================
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext';
+import { FileTextIcon } from './components/Icons';
 import '../shared/components/Auth.css';
+import './StudentPortal.css';
+import { CinematicAtmosphere, BrandMark } from '../shared/components/CinematicAtmosphere';
+
+const PROGRAM_CODES = String(import.meta.env.VITE_VIT_PROGRAM_CODES || '').split(',').map((code) => code.trim().toUpperCase()).filter(Boolean);
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'student',
-    rollNumber: '',
-    hostel: '',
-    phone: '',
-  });
+  const [formData, setFormData] = useState({ name: '', registrationNumber: '', email: '', password: '', confirmPassword: '', studentType: '', hostel: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((current) => ({ ...current, [name]: name === 'registrationNumber' ? value.replace(/\s/g, '').toUpperCase() : value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
+    const registrationNumber = formData.registrationNumber.replace(/\s/g, '').toUpperCase();
+    const match = registrationNumber.match(/^(\d{2})([A-Z]{2,6})(\d{3,8})$/);
+    if (!match) return setError('Enter your registration number, for example 25BCE10746.');
+    if (PROGRAM_CODES.length && !PROGRAM_CODES.includes(match[2])) return setError('That program code is not currently enabled.');
+    const email = formData.email.trim().toLowerCase();
+    const localPart = email.split('@')[0] || '';
+    if (email.split('@')[1] !== 'vitbhopal.ac.in' || localPart.toUpperCase().slice(localPart.lastIndexOf('.') + 1) !== registrationNumber || localPart.length <= registrationNumber.length + 1) {
+      return setError('Use your VIT Bhopal email and make sure it contains the same registration number.');
     }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
+    if (!['Hosteller', 'Day Scholar'].includes(formData.studentType)) return setError('Choose Hosteller or Day Scholar.');
+    if (formData.studentType === 'Hosteller' && !formData.hostel.trim()) return setError('Add your hostel details.');
+    if (formData.password.length < 8) return setError('Use a password with at least 8 characters.');
+    if (formData.password !== formData.confirmPassword) return setError('Passwords do not match.');
 
     setLoading(true);
-
     try {
-      const res = await register({
-        name: formData.name,
-        email: formData.email,
+      await register({
+        name: formData.name.trim(),
+        registrationNumber,
+        rollNumber: registrationNumber,
+        email,
         password: formData.password,
-        role: formData.role,
-        rollNumber: formData.rollNumber,
-        hostel: formData.hostel,
-        phone: formData.phone,
+        studentType: formData.studentType,
+        hostel: formData.studentType === 'Hosteller' ? formData.hostel.trim() : '',
       });
-
-      const role = res.data.user.role;
-      if (role === 'admin') navigate('/admin/dashboard');
-      else if (role === 'staff') navigate('/staff/dashboard');
-      else navigate('/dashboard');
-
-    } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      navigate('/dashboard');
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || requestError.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-header">
-          <span className="auth-icon">📝</span>
-          <h1 className="auth-title">Create Account</h1>
-          <p className="auth-subtitle">Join CampusFix and start filing complaints</p>
-        </div>
-
-        {error && <div className="alert alert-error">{error}</div>}
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {/* Role selector */}
-          <div className="auth-role-selector">
-            {['student', 'staff', 'admin'].map((role) => (
-              <button
-                key={role}
-                type="button"
-                className={`auth-role-btn ${formData.role === role ? 'active' : ''}`}
-                onClick={() => setFormData({ ...formData, role })}
-              >
-                {role === 'student' ? '🎓 Student' : role === 'staff' ? '👷 Staff' : '🔑 Admin'}
-              </button>
-            ))}
+    <CinematicAtmosphere variant="auth">
+      <div className="auth-page"><div className="portal-topbar"><BrandMark /><Link to="/login" className="portal-button">Log in</Link></div>
+        <div className="auth-card">
+          <div className="auth-header">
+            <div className="auth-icon-box" aria-hidden="true"><FileTextIcon size={20} /></div>
+            <h1 className="auth-title">Your campus, in good hands.</h1>
+            <p className="auth-subtitle">Create your VIT Bhopal student account to report and follow campus issues.</p>
           </div>
-
-          <div className="form-group">
-            <label className="form-label">Full Name</label>
-            <input
-              type="text"
-              name="name"
-              className="form-input"
-              placeholder="Enter your full name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              name="email"
-              className="form-input"
-              placeholder="your.email@college.edu"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {formData.role === 'student' && (
-            <>
-              <div className="form-group">
-                <label className="form-label">Roll Number</label>
-                <input
-                  type="text"
-                  name="rollNumber"
-                  className="form-input"
-                  placeholder="e.g., CSE2024001"
-                  value={formData.rollNumber}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Hostel / Building</label>
-                <input
-                  type="text"
-                  name="hostel"
-                  className="form-input"
-                  placeholder="e.g., Hostel A"
-                  value={formData.hostel}
-                  onChange={handleChange}
-                />
-              </div>
-            </>
-          )}
-
-          <div className="form-group">
-            <label className="form-label">Phone (optional)</label>
-            <input
-              type="tel"
-              name="phone"
-              className="form-input"
-              placeholder="Your phone number"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-input"
-              placeholder="Minimum 6 characters"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              className="form-input"
-              placeholder="Re-enter your password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
-
-        <div className="auth-footer">
-          Already have an account? <Link to="/login">Log in</Link>
+          {error && <div className="alert alert-error" role="alert">{error}</div>}
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="form-group"><label className="form-label" htmlFor="student-name">Full name</label><input id="student-name" type="text" name="name" className="form-input" placeholder="Your name" value={formData.name} onChange={handleChange} minLength={2} required autoComplete="name" /></div>
+            <div className="form-group"><label className="form-label" htmlFor="registration-number">Registration number</label><input id="registration-number" type="text" name="registrationNumber" className="form-input" placeholder="25BCE10746" value={formData.registrationNumber} onChange={handleChange} pattern="[0-9]{2}[A-Za-z]{2,6}[0-9]{3,8}" title="Two-digit year, program code, and student number" required autoCapitalize="characters" /></div>
+            <div className="form-group"><label className="form-label" htmlFor="student-email">VIT email</label><input id="student-email" type="email" name="email" className="form-input" placeholder="name.25bce10746@vitbhopal.ac.in" value={formData.email} onChange={handleChange} required autoComplete="email" /></div>
+            <fieldset className="student-type-fieldset"><legend className="form-label">I am a…</legend><div className="student-type-options">
+              {['Hosteller', 'Day Scholar'].map((type) => <label className={`student-type-option ${formData.studentType === type ? 'selected' : ''}`} key={type}><input type="radio" name="studentType" value={type} checked={formData.studentType === type} onChange={handleChange} required /><span>{type}</span></label>)}
+            </div></fieldset>
+            {formData.studentType === 'Hosteller' && <div className="form-group hosteller-fields"><label className="form-label" htmlFor="hostel-details">Hostel / block</label><input id="hostel-details" type="text" name="hostel" className="form-input" placeholder="Your hostel and block" value={formData.hostel} onChange={handleChange} required autoComplete="off" /></div>}
+            <div className="form-group"><label className="form-label" htmlFor="student-password">Password</label><input id="student-password" type="password" name="password" className="form-input" placeholder="At least 8 characters" value={formData.password} onChange={handleChange} minLength={8} required autoComplete="new-password" /></div>
+            <div className="form-group"><label className="form-label" htmlFor="confirm-password">Confirm password</label><input id="confirm-password" type="password" name="confirmPassword" className="form-input" placeholder="Enter it once more" value={formData.confirmPassword} onChange={handleChange} minLength={8} required autoComplete="new-password" /></div>
+            <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Creating your account…' : 'Create student account'}</button>
+          </form>
+          <div className="auth-footer">Already have an account? <Link to="/login">Log in</Link></div>
         </div>
       </div>
-    </div>
+    </CinematicAtmosphere>
   );
 }

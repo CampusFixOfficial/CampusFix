@@ -1,183 +1,78 @@
-// =============================================================
-// CampusFix - Main App Component (Root Router)
-// =============================================================
-// Sets up React Router and wraps the app in AuthProvider.
-// Routes are organized by portal/ownership area.
-// Owner: Bhavishya (architecture/integration)
-// =============================================================
-
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './shared/context/AuthContext';
-import Navbar from './shared/components/Navbar';
-import Landing from './shared/components/Landing';
-
-// Student Portal pages (Pranjal's area)
-import Login from './student-portal/Login';
-import Register from './student-portal/Register';
-
 import './index.css';
 
-// Protected route wrapper — redirects to login if not authenticated
+const Landing = lazy(() => import('./shared/components/Landing'));
+const Login = lazy(() => import('./student-portal/Login'));
+const Register = lazy(() => import('./student-portal/Register'));
+const StudentDashboard = lazy(() => import('./student-portal/StudentDashboard'));
+const Complaints = lazy(() => import('./student-portal/Complaints'));
+const ComplaintNew = lazy(() => import('./student-portal/ComplaintNew'));
+const ComplaintDetail = lazy(() => import('./student-portal/ComplaintDetail'));
+const AuthorityLogin = lazy(() => import('./student-portal/AuthorityLogin'));
+const AuthorityDashboard = lazy(() => import('./student-portal/AuthorityDashboard'));
+const AdminDashboard = lazy(() => import('./student-portal/AdminDashboard'));
+const CampusProblemLandscape = lazy(() => import('./student-portal/CampusProblemLandscape'));
+const CampusProblemLandscapePreview = import.meta.env.DEV ? lazy(() => import('./student-portal/CampusProblemLandscapePreview')) : null;
+const StudentDashboardPreview = import.meta.env.DEV ? lazy(() => import('./student-portal/StudentDashboardPreview')) : null;
+const ComplaintDetailPreview = import.meta.env.DEV ? lazy(() => import('./student-portal/ComplaintDetailPreview')) : null;
+const ReportIssuePreview = import.meta.env.DEV ? lazy(() => import('./student-portal/ReportIssuePreview')) : null;
+const DevComplaintsPreview = import.meta.env.DEV ? lazy(() => import('./student-portal/DevComplaintsPreview')) : null;
+const AuthorityDashboardPreview = import.meta.env.DEV ? lazy(() => import('./student-portal/AuthorityDashboardPreview')) : null;
+const AdminDashboardPreview = import.meta.env.DEV ? lazy(() => import('./student-portal/AdminDashboardPreview')) : null;
+
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
+  const location = useLocation();
+  if (loading) return <div className="loading-container" role="status" aria-label="Loading account"><div className="spinner" /></div>;
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    const loginPath = location.pathname.startsWith('/admin')
+      ? '/admin/login'
+      : location.pathname.startsWith('/authority')
+        ? '/authority/login'
+        : '/login';
+    return <Navigate to={loginPath} replace state={{ from: location.pathname }} />;
   }
-
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    return <Navigate to="/" />;
+    const home = user?.role === 'admin' ? '/admin' : user?.role === 'staff' ? '/authority' : '/dashboard';
+    return <Navigate to={home} replace />;
   }
-
   return children;
 }
 
-// Placeholder pages (will be built by Pranjal and Prisha)
-function StudentDashboard() {
-  const { user } = useAuth();
-  return (
-    <div className="page">
-      <div className="container">
-        <div className="page-header animate-fade-in">
-          <h1 className="page-title">Welcome, <span className="gradient-text">{user?.name}</span> 👋</h1>
-          <p className="page-subtitle">Your student dashboard — manage and track complaints</p>
-        </div>
-        <div className="grid grid-3">
-          <div className="card">
-            <span style={{ fontSize: '2rem' }}>📝</span>
-            <h3 style={{ margin: '0.5rem 0' }}>File a Complaint</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-              Describe your issue and we'll route it automatically.
-            </p>
-          </div>
-          <div className="card">
-            <span style={{ fontSize: '2rem' }}>📋</span>
-            <h3 style={{ margin: '0.5rem 0' }}>My Complaints</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-              Track the status of all your submitted complaints.
-            </p>
-          </div>
-          <div className="card">
-            <span style={{ fontSize: '2rem' }}>⭐</span>
-            <h3 style={{ margin: '0.5rem 0' }}>Rate Resolutions</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-              Provide feedback on resolved complaints.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StaffDashboard() {
-  const { user } = useAuth();
-  return (
-    <div className="page">
-      <div className="container">
-        <div className="page-header animate-fade-in">
-          <h1 className="page-title">Department Queue</h1>
-          <p className="page-subtitle">View and manage complaints assigned to your department</p>
-        </div>
-        <div className="card">
-          <p style={{ color: 'var(--text-secondary)' }}>
-            🚧 Employee dashboard coming soon — will be built by Prisha.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AdminDashboard() {
-  return (
-    <div className="page">
-      <div className="container">
-        <div className="page-header animate-fade-in">
-          <h1 className="page-title">Admin <span className="gradient-text">Dashboard</span></h1>
-          <p className="page-subtitle">Overview of all campus complaints and analytics</p>
-        </div>
-        <div className="grid grid-4">
-          <div className="card">
-            <span style={{ fontSize: '2rem' }}>📊</span>
-            <h3 style={{ margin: '0.5rem 0' }}>Total Complaints</h3>
-            <p className="gradient-text" style={{ fontSize: '2rem', fontWeight: 800 }}>—</p>
-          </div>
-          <div className="card">
-            <span style={{ fontSize: '2rem' }}>⏳</span>
-            <h3 style={{ margin: '0.5rem 0' }}>Pending</h3>
-            <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-warning)' }}>—</p>
-          </div>
-          <div className="card">
-            <span style={{ fontSize: '2rem' }}>✅</span>
-            <h3 style={{ margin: '0.5rem 0' }}>Resolved</h3>
-            <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-secondary)' }}>—</p>
-          </div>
-          <div className="card">
-            <span style={{ fontSize: '2rem' }}>🚨</span>
-            <h3 style={{ margin: '0.5rem 0' }}>Escalated</h3>
-            <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-danger)' }}>—</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function AppRoutes() {
-  return (
-    <>
-      <Navbar />
-      <div className="content-wrapper">
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+  return <div className="content-wrapper"><Suspense fallback={<div className="loading-container" role="status" aria-label="Loading CampusFix"><div className="spinner" /></div>}><Routes>
+    <Route path="/" element={<Landing />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/authority/login" element={<AuthorityLogin />} />
+    <Route path="/admin/login" element={<AuthorityLogin />} />
 
-          {/* Student routes (Pranjal's area) */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <StudentDashboard />
-            </ProtectedRoute>
-          } />
+    {import.meta.env.DEV && <>
+      <Route path="/__dev/student-dashboard" element={<StudentDashboardPreview />} />
+      <Route path="/__dev/report-issue" element={<ReportIssuePreview />} />
+      <Route path="/__dev/complaints" element={<DevComplaintsPreview />} />
+      <Route path="/__dev/complaint-detail" element={<ComplaintDetailPreview />} />
+      <Route path="/__dev/authority-dashboard" element={<AuthorityDashboardPreview />} />
+      <Route path="/__dev/admin-dashboard" element={<AdminDashboardPreview />} />
+      <Route path="/__dev/campus-problem-landscape" element={<CampusProblemLandscapePreview />} />
+    </>}
 
-          {/* Staff routes (Prisha's area) */}
-          <Route path="/staff/dashboard" element={
-            <ProtectedRoute allowedRoles={['staff']}>
-              <StaffDashboard />
-            </ProtectedRoute>
-          } />
-
-          {/* Admin routes (Prisha's area) */}
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </div>
-    </>
-  );
+    <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+    <Route path="/complaints" element={<ProtectedRoute allowedRoles={['student']}><Complaints /></ProtectedRoute>} />
+    <Route path="/complaints/new" element={<ProtectedRoute allowedRoles={['student']}><ComplaintNew /></ProtectedRoute>} />
+    <Route path="/complaints/:id" element={<ProtectedRoute allowedRoles={['student', 'staff', 'admin']}><ComplaintDetail /></ProtectedRoute>} />
+    <Route path="/authority" element={<ProtectedRoute allowedRoles={['staff']}><AuthorityDashboard /></ProtectedRoute>} />
+    <Route path="/authority/landscape" element={<Navigate to="/authority" replace />} />
+    <Route path="/staff/dashboard" element={<Navigate to="/authority" replace />} />
+    <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+    <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+    <Route path="/admin/landscape" element={<ProtectedRoute allowedRoles={['admin']}><CampusProblemLandscape /></ProtectedRoute>} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes></Suspense></div>;
 }
 
 export default function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </Router>
-  );
+  return <Router><AuthProvider><AppRoutes /></AuthProvider></Router>;
 }

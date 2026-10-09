@@ -7,7 +7,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext';
+import { LockIcon } from './components/Icons';
 import '../shared/components/Auth.css';
+import { CinematicAtmosphere, BrandMark } from '../shared/components/CinematicAtmosphere';
 
 export default function Login() {
   const { login } = useAuth();
@@ -25,11 +27,11 @@ export default function Login() {
 
     try {
       const res = await login(email, password);
-      const role = res.data.user.role;
+      const role = res.user.role;
 
       // Redirect based on role
-      if (role === 'admin') navigate('/admin/dashboard');
-      else if (role === 'staff') navigate('/staff/dashboard');
+      if (role === 'admin') navigate('/admin');
+      else if (role === 'staff') navigate('/authority');
       else navigate('/dashboard');
 
     } catch (err) {
@@ -39,12 +41,15 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
+    <CinematicAtmosphere variant="auth">
+    <div className="auth-page"><div className="portal-topbar"><BrandMark /><Link to="/register" className="portal-button">Create account</Link></div>
       <div className="auth-card">
         <div className="auth-header">
-          <span className="auth-icon">🔐</span>
+          <div className="auth-icon-box" aria-hidden="true">
+            <LockIcon size={20} />
+          </div>
           <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle">Log in to your CampusFix account</p>
+            <p className="auth-subtitle">Log in to your VIT Bhopal student account</p>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}
@@ -55,7 +60,7 @@ export default function Login() {
             <input
               type="email"
               className="form-input"
-              placeholder="your.email@college.edu"
+              placeholder="name.25bce10746@vitbhopal.ac.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -80,9 +85,10 @@ export default function Login() {
         </form>
 
         <div className="auth-footer">
-          Don't have an account? <Link to="/register">Sign up</Link>
+          Don&apos;t have an account? <Link to="/register">Sign up</Link>
         </div>
       </div>
     </div>
+    </CinematicAtmosphere>
   );
 }

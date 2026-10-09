@@ -1,0 +1,24 @@
+{
+  "routes": [
+    { "path": "/", "title": "CampusFix home" },
+    { "path": "/login", "title": "Student sign in" },
+    { "path": "/register", "title": "Student registration" },
+    { "path": "/authority/login", "title": "Authority sign in" },
+    { "path": "/dashboard", "title": "Student dashboard" },
+    { "path": "/complaints", "title": "Student reports" },
+    { "path": "/complaints/new", "title": "Report a campus issue" },
+    { "path": "/complaints/:id", "title": "Report details" },
+    { "path": "/authority", "title": "Authority team queue" },
+    { "path": "/staff/dashboard", "title": "Authority dashboard redirect" },
+    { "path": "/admin", "title": "Administrator dashboard and Campus Problem Landscape" },
+    { "path": "/admin/dashboard", "title": "Administrator dashboard" },
+    { "path": "/admin/landscape", "title": "Admin Campus Problem Landscape" },
+    { "path": "/__dev/student-dashboard", "title": "Student dashboard demo" },
+    { "path": "/__dev/report-issue", "title": "Report journey demo" },
+    { "path": "/__dev/complaints", "title": "Report tracking demo" },
+    { "path": "/__dev/complaint-detail", "title": "Student report updates demo" },
+    { "path": "/__dev/authority-dashboard", "title": "Authority workspace demo" },
+    { "path": "/__dev/admin-dashboard", "title": "Full Admin portal demo" },
+    { "path": "/__dev/campus-problem-landscape", "title": "Campus Problem Landscape demo" }
+  ]
+}

@@ -53,9 +53,43 @@ const userSchema = new mongoose.Schema({
     default: null,
   },
 
+  // Employee identity is used only for authority sign-in; department access stays admin-assigned.
+  employeeId: {
+    type: String,
+    trim: true,
+    uppercase: true,
+    minlength: [2, 'Employee ID must be at least 2 characters'],
+    maxlength: [40, 'Employee ID cannot exceed 40 characters'],
+    unique: true,
+    sparse: true,
+    default: undefined,
+  },
+
+  // Hostel Administration staff may coordinate reports from Admin-assigned hostel locations.
+  // This scope supplements (never replaces) the account's operational department.
+  managedLocations: [{
+    type: String,
+    trim: true,
+  }],
+
   // Student-specific fields
   rollNumber: {
     type: String,
+    default: '',
+  },
+
+  registrationNumber: {
+    type: String,
+    uppercase: true,
+    trim: true,
+    unique: true,
+    sparse: true,
+    default: undefined,
+  },
+
+  studentType: {
+    type: String,
+    enum: ['Hosteller', 'Day Scholar', ''],
     default: '',
   },
 
@@ -80,15 +114,14 @@ const userSchema = new mongoose.Schema({
 });
 
 // ---- Middleware: Hash password before saving ----
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   // Only hash if the password was changed (or is new)
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return;
 
   // Hash the password with a "salt" of 12 rounds
   // (Salt = random data added to make each hash unique, even for identical passwords)
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 // ---- Method: Check if entered password matches stored hash ----

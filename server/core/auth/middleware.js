@@ -32,7 +32,7 @@ const protect = async (req, res, next) => {
     const decoded = jwt.verify(token, config.JWT_SECRET);
 
     // Find the user and attach to the request
-    const user = await User.findById(decoded.id).select('-password');
+    const user = await User.findById(decoded.id).select('-password').populate('department', 'name');
     if (!user) {
       return res.status(401).json({
         status: 'error',
@@ -59,6 +59,22 @@ const protect = async (req, res, next) => {
   }
 };
 
+// Feedback is open to visitors. If a bearer token is provided, validate it and
+// derive identity from the account rather than accepting sender fields from the client.
+const optionalProtect = async (req, res, next) => {
+  const authorization = req.headers.authorization || '';
+  if (!authorization.startsWith('Bearer ')) return next();
+  try {
+    const decoded = jwt.verify(authorization.split(' ')[1], config.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password').populate('department', 'name');
+    if (!user || !user.isActive) return res.status(401).json({ status: 'error', message: 'Your account session is no longer active.' });
+    req.user = user;
+    return next();
+  } catch (error) {
+    return res.status(401).json({ status: 'error', message: 'Your session is invalid or expired. Please sign in again.' });
+  }
+};
+
 // ---- Role-based access: only allow specific roles ----
 const authorize = (...roles) => {
   return (req, res, next) => {
@@ -80,6 +96,7 @@ const staffOrAdmin = authorize('staff', 'admin');
 
 module.exports = {
   protect,
+  optionalProtect,
   authorize,
   studentOnly,
   staffOnly,

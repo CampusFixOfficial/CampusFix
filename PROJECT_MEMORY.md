@@ -1,6 +1,6 @@
 # CampusFix — Project Memory (Source of Truth)
 
-> **Last updated:** 2026-08-25 | **Updated by:** Bhavishya Gupta
+> **Last updated:** 2026-09-08 | **Updated by:** Pranjal Singh (Student Portal)
 
 ---
 
@@ -88,7 +88,7 @@ CampusFix/
 │   └── .env                        #   Secrets (NEVER commit)
 ├── client/                         # Frontend (React + Vite)
 │   └── src/
-│       ├── student-portal/         # Pranjal: Login, Register
+│       ├── student-portal/         # Pranjal: Login, Register, services, utils, components, StudentPortal.css
 │       ├── admin-portal/           # Prisha: (pending)
 │       ├── shared/                 # Shared components
 │       │   ├── components/         #   Navbar, Landing page
@@ -146,7 +146,7 @@ CampusFix/
 
 ### Phase 4 — Complaint Intake ✅ (API ready)
 - [ ] 4.1 Image upload middleware (needs Cloudinary)
-- [ ] 4.2 Client-side image compression
+- [x] 4.2 Client-side image compression (HTML5 Canvas in client/src/student-portal/utils/imageCompressor.js)
 - [ ] 4.3 Cloudinary connection
 - [x] 4.4 POST /api/complaints
 - [x] 4.5 GET /api/complaints/mine
@@ -160,18 +160,21 @@ CampusFix/
 - [ ] 5.4 Test suite
 - [ ] 5.5 Manual testing (needs DB)
 
-### Phase 6 — Student Portal Frontend (partial)
+### Phase 6 — Student Portal Frontend (in progress)
 - [x] 6.1 React app initialized (Vite)
 - [x] 6.2 CSS design system
 - [x] 6.3 Layout/Navbar component
 - [x] 6.4 Signup page
 - [x] 6.5 Login page
 - [x] 6.6 Auth context (JWT storage + role routing)
-- [ ] 6.7 Complaint form page
-- [ ] 6.8 My Complaints page
-- [ ] 6.9 Complaint detail page
-- [ ] 6.10 Student dashboard (placeholder built)
-- [ ] 6.11 Full end-to-end test
+- [x] 6.7 Student Portal foundation (services/complaintService.js, utils/imageCompressor.js, StudentPortal.css, components/ directory)
+- [x] 6.8 Student dashboard (live API stats, recent grievances, quick actions, empty/loading/error states)
+- [x] 6.8b Visual redesign pass (AmbientBackground living environment, Manus-style dark aesthetic, 4-stage pipeline visualization, zero emojis, unified telemetry deck)
+- [x] 6.8c Landing page visual implementation (Concept Reference Image: media_1788872009336.jpg — luminous silk waves, spatial neural pipeline with travelling light filaments, 4-step intake-to-resolution, and department SLA matrix)
+- [ ] 6.9 Complaint form page (with client compression & anonymous toggle)
+- [ ] 6.10 My Complaints page (filters & search)
+- [ ] 6.11 Complaint detail page (status timeline & resolution feedback)
+- [ ] 6.12 Full end-to-end test
 
 ### Phase 7–14 — Not started yet
 
@@ -184,6 +187,11 @@ CampusFix/
 | 2026-08-25 | JWT for auth (not Firebase) | Simpler, no extra account, fully self-contained |
 | 2026-08-25 | Cloudinary for images (not Firebase Storage) | Simpler setup, 25GB free, one account |
 | 2026-08-25 | Vite for React (not CRA) | Faster dev server, modern tooling |
+| 2026-09-07 | Native HTML5 Canvas for image compression | Zero-cost, zero new dependencies; resizes & compresses JPEG/PNG/WebP to <=500KB |
+| 2026-09-07 | Modular complaintService using shared Axios | Reuses AuthContext token storage and Axios config without creating duplicate auth |
+| 2026-09-07 | Lightweight local SVGs & CSS for dashboard | Kept zero external runtime dependencies; used native CSS animations and inline SVGs instead of installing Motion/Lucide |
+| 2026-09-07 | Manus-style atmospheric redesign & zero emojis | Eliminated all emojis across UI; implemented multi-layered AmbientBackground, 4-stage live pipeline visualizer, and telemetry deck |
+| 2026-09-08 | Concept reference image landing implementation | Implemented luminous silk waves, spatial neural flow (Student Report -> AI Classification -> Department Nodes -> Issue Resolved), telemetry bar, and 4-step progressive resolution flow with zero external libraries and zero emojis |
 
 ---
 
@@ -192,5 +200,57 @@ CampusFix/
 1. **MongoDB not connected** — need to create Atlas account and add URI to `.env`
 2. **Cloudinary not connected** — need to create account and add credentials
 3. **Not pushed to GitHub yet** — need to do initial commit and push
-4. **Complaint form UI not built** — next priority for Pranjal's area
-5. **Employee dashboard not built** — next priority for Prisha's area
+4. **Dependencies note** — Framer Motion and Lucide React are not in package.json; native CSS keyframes and SVG components used to avoid unauthorized packages
+5. **Node.js/npm not in Windows PATH** — Node/npm command not directly in PowerShell PATH on dev machine
+6. **Complaint form UI not built** — next priority for Pranjal's area (Step 3)
+7. **Employee dashboard not built** — next priority for Prisha's area
+
+
+## Step 1.1 — Student Portal local preview (2026-09-13)
+
+- Added a development-only dashboard preview at `/__dev/student-dashboard` using clearly marked mock student data.
+- Added a development-only Report Issue / AI Understanding preview at `/__dev/report-issue`.
+- The preview demonstrates natural-language intake, optional local image preview, optional campus location, anonymous mode, a short processing state, and a local keyword-based interpretation.
+- Preview interpretation is explicitly not the real NLP classifier and never calls the backend or stores data.
+- Simplified Student Dashboard language for ordinary students while preserving the existing visual effects and real authenticated route.
+- Production builds redirect development preview routes to `/` through `import.meta.env.DEV` guards.
+- Real `/login`, protected `/dashboard`, JWT authentication, API contracts, server code, landing page, and MongoDB configuration were not changed for this work.
+- MongoDB Atlas remains pending; real complaint submission, image storage, classifier integration, and later Student Portal features remain separate tasks.
+
+
+## Current implementation handover — 2026-10-06
+
+This section supersedes older roadmap entries above where they describe the student/Authority portals, report form, or analytics as not yet built.
+
+- The VIT Bhopal experience now includes the premium student reporting journey, progressive Prism understanding sequence, and the bundled interactive ThreeUI paper report.
+- Natural-language problem locations are parsed into structured campus fields. Reports are routed to exactly five configured CampusFix teams with inferred priority and expected-resolution guidance.
+- The Campus Problem Landscape replaces the heatmap concept and is the lead view of the Admin dashboard (`/admin`), with `/admin/landscape` as an Admin-only direct route. It groups reports by structured campus locations without geographic coordinates. The Authority role has no landscape link or access; the retired Authority URL redirects to its team queue.
+- The live landscape uses stored status, priority, response history and explicit duplicate links only. Multiple reports at the same place are not presented as recurring unless the records contain an explicit duplicate relationship. The development-only landscape uses fixed, labelled illustrative data and never submits to the database.
+- Admin retains team routing, employee-ID/team access management and report reassignment below the landscape. Authority has a compact, filterable team queue that opens one complete report at a time, including photo evidence or “No image available”, student wording, location, status history and the appropriate next action. High/urgent queue cards receive restrained emphasis; status actions remain attached to the selected report.
+- The authenticated report, user, Authority, team, status-history, acknowledgement, reassignment, analytics, and feedback paths are backed by Mongoose model reads/writes. Backend landscape coverage includes privacy and actual repeat-link metrics; rebuild/test results are recorded in the current task handover below.
+- A secret-free `server/.env.example` is provided. A live MongoDB URI is not configured in this workspace, so live connection and database-backed end-to-end persistence remain to be verified after the owner supplies their own MongoDB settings.
+- The FlexCarousel keeps clearly identified illustrative placeholders until the owner supplies the promised campus-problem photos; do not present the placeholders as campus photographs.
+
+
+## Admin landscape and Authority experience refinement — 2026-10-06
+
+- The Admin portal now leads with the live Campus Problem Landscape, with routing/access/report-assignment tools preserved below it; the live API and route are Admin-only. The retired `/authority/landscape` URL redirects to the Authority queue.
+- The landscape starts with simple campus-wide counts and a current-state mix, then opens a location detail only after selection. Its intensity is derived from recorded open/high-priority/urgent/explicitly linked-repeat counts. It groups the VIT Bhopal location directory without geographic coordinates.
+- Recurrence is deliberately conservative: counts use only `isDuplicate`/`duplicateOf` records; sharing a location is not enough to claim a recurring issue. Duplicate group IDs are used only in-memory and never returned by the aggregate endpoint.
+- Authority now has a compact status-filtered queue; selecting a card opens a report detail with student wording, understood team/location/priority, attached photo or “No image available”, status history, contact details, and a single dominant next action. High/urgent cards get restrained emphasis. The demo runs the same interface with local fictional records and disabled external actions.
+- Verification in this continuation: all 15 backend tests pass, including a regression that checks authentication and Admin-only access on the landscape endpoint; the production Vite build succeeds. The only build notice is the existing >500 kB ThreeUI paper chunk warning. Live MongoDB behavior still awaits the owner's own connection settings.
+
+## Full Admin demo preview — 2026-10-06
+
+The development-only `/__dev/admin-dashboard` route uses the actual Admin portal UI in isolated sample mode, including all five teams, fictional Authority accounts, sample reports, the Campus Problem Landscape, and page-local create/edit/assign actions. It is explicitly marked as a demo, skips auth validation, and does not call the API or persist changes. The protected `/admin` production route is unchanged.
+
+
+## Cross-portal coordination and feedback — 2026-10-06
+
+- Added one CampusFix platform-feedback surface to the public Landing page, Student portal and Authority portal. Submissions use a separate `PlatformFeedback` collection; Admin reads them in a separate, Admin-only inbox. Sender role/identity is derived from optional verified auth, and the displayed source is allow-listed. This is not a complaint remark or a post-resolution rating.
+- Added persisted, timestamped Authority remarks on reports, with role labels (`Authority` / location-scoped `Hostel Warden`) and a separate chronological, student-visible updates timeline. The existing one-time post-resolution rating remains independent.
+- Added canonical Admin-assigned hostel location scopes for Hostel Administration Authority accounts. A scoped account can coordinate only reports at its selected problem locations across operational teams; the report continues to identify the operational team responsible. An unscoped account keeps its normal department queue. Student residence is not used to derive the reported problem place or access scope.
+- Authority sharing now prepares issue-specific, privacy-conscious WhatsApp text without student identifiers. When supported, original images can be prepared for the device share sheet; the interface offers honest manual-photo fallbacks and never sends anything automatically.
+- Added the development-only `/__dev/complaint-detail` preview using the actual student detail component and fictional timestamped remarks. The complaints demo now uses only visibly synthetic student identifiers and links to this detail preview. All `/__dev/...` demonstrations remain local-only; live routes persist only when the owner configures MongoDB and the API.
+- Updated `README.md`, `AUTHORITY_WORKFLOW_GUIDE.md`, and `ADMIN_WORKFLOW_GUIDE.md` to describe the current, distinct workflows and sample-data boundaries. The full source ZIP must be regenerated from this current `CampusFix/` folder before handoff.
+- Verification on 2026-10-06: backend `npm test` passes **29/29**; client `npm run build` succeeds (known ThreeUI paper chunk-size advisory only); all 20 route-manifest entries parse without duplicates; Vite serves all key demo routes; a scan found no real-looking VIT email/registration identifiers in the targeted preview fixtures. Live MongoDB persistence remains unverified because no credentials/configuration are included.
